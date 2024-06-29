@@ -1,0 +1,9 @@
+
+### Request to find existing id - 200
+GET http://localhost:8080/cicd/api/todos/existing_id_here
+Accept: application/json
+
+
+### Request to find non existing id - 404
+GET http://localhost:8080/cicd/api/todos/{{$uuid}}
+Accept: application/json

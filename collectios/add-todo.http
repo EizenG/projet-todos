@@ -1,0 +1,34 @@
+### Request to add todo - 200
+POST http://localhost:8080/cicd/api/todos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "title 2",
+  "description": "description 2"
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+### Request to add todo - 409
+POST http://localhost:8080/cicd/api/todos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "Existing title here",
+  "description": "description 2"
+}
+
+

@@ -1,0 +1,89 @@
+name: Build-Analyze-Deliver-Deploy
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Build and analyze
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up  JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: 17
+          distribution: 'zulu'
+
+      - name: Cache SonarCloud packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.sonar/cache
+          key: ${{ runner.os }}-sonar
+          restore-keys: ${{ runner.os }}-sonar
+
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+
+      - name: Dependencies Scan
+        #if: 1>2
+        run: mvn clean verify -DskipTests -Pcve
+
+      - name: Unit Testing
+        run: mvn test -Put
+
+      - name: Integration Testing
+        run: mvn test -Pit
+
+      - name: Quality Gate
+        #votre travail
+        #adapter : peut utiliser sonarcloud ou une instance distante
+        run: mvn clean verify sonar:sonar -Dsonar.organization=ept-git -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=seenibu_poc-todos
+
+      - name: Check Quality Gate
+        #votre travail
+        #verifier si la Quality Gate is ok
+        run: echo "Checking quality gate ... "
+
+      - name: Package
+        run: mvn -B package  -DskipTests=true
+
+      - name: Login to Docker
+        #votre travail
+        #les trois prochaines etapes peuven etre fusionnees en une seule, le decoupe est volontaire pour plus de comprehension
+        run: |
+          docker login -u=${{secrets.DOCKER_USERNAME}} -p=${{ secrets.DOCKER_TOKEN}} docker.io
+
+      - name: Build Docker image
+        run: |
+          docker build -t  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}:${{ github.sha }} -t  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}:latest  .   
+
+      - name: Publish Docker image versions
+        run: |
+          docker push --all-tags  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}
+
+      - name: Deploy to Dev
+        #votre travail
+        #se connecter a un serveur distant et deployer l'image docker que vous venez de builder
+        run: echo " 1) Login to my remote server ...\n 2) Stop docker container if running ... \n 3) Pull latest version and run it ... "
+
+      - name: Wait for deploy to finish
+        #votre travail
+        run: echo "Wait 30s ... "
+
+      - name: Check deploy
+        #verifier si le deploiement s'est bien passe
+        #votre travail
+        run: echo " 1) Run Get request <my_server_ip:my_port/cicd/_health> to check if service is running ...\n 2) Get request should return 200 with content <Welcome to my Todo app> ..."
+
+
+

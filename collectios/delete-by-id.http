@@ -1,0 +1,9 @@
+
+### Request to delete existing id - 204
+DELETE http://localhost:8080/cicd/api/todos/existing_id_here
+Accept: application/json
+
+
+### Request to delete non existing id - 404
+DELETE http://localhost:8080/cicd/api/todos/{{$uuid}}
+Accept: application/json

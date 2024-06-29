@@ -1,0 +1,9 @@
+
+### Request to complete existing todo - 200
+PUT http://localhost:8080/cicd/api/todos/existing_id_here/complete
+Accept: application/json
+
+
+### Request to complete non existing todo - 404
+PUT http://localhost:8080/cicd/api/todos/{{$uuid}}/complete
+Accept: application/json

@@ -1,0 +1,20 @@
+### Request to update existing todo - 200
+PUT http://localhost:8080/cicd/api/todos/existing_id_here
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "new title 1",
+  "description": "new description 1"
+}
+
+
+### Request to update non existing todo - 404
+PUT http://localhost:8080/cicd/api/todos/{{$uuid}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "title": "new title",
+  "description": "new description"
+}
