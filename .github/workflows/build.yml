@@ -14,7 +14,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Set up  JDK 17
+      - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
           java-version: 17
@@ -47,14 +47,9 @@ jobs:
         run: mvn test -Pit
 
       - name: Quality Gate
-        #votre travail
-        #adapter : peut utiliser sonarcloud ou une instance distante
         run: mvn clean verify sonar:sonar -Dsonar.organization=eizeng -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=EizenG_projet-todos
 
       - name: Check Quality Gate
-        #votre travail
-        #verifier si la Quality Gate is ok
-        # Tester pour voir si jq est installe sur mon environement Github action ou non
         run: |
           status=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
             "https://sonarcloud.io/api/qualitygates/project_status?projectKey=EizenG_projet-todos" | jq -r '.projectStatus.status')
@@ -66,30 +61,29 @@ jobs:
           fi
 
       - name: Package
-        run: mvn -B package  -DskipTests=true
+        run: mvn -B package -DskipTests=true
 
       - name: Login to Docker
-        #votre travail
-        #les trois prochaines etapes peuven etre fusionnees en une seule, le decoupe est volontaire pour plus de comprehension
         run: |
-          docker login -u=${{secrets.DOCKER_USERNAME}} -p=${{ secrets.DOCKER_TOKEN}} docker.io
+          docker login -u=${{ secrets.DOCKER_USERNAME }} -p=${{ secrets.DOCKER_TOKEN }} docker.io
 
       - name: Build Docker image
         run: |
-          docker build -t  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}:${{ github.sha }} -t  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}:latest  .   
+          docker_username=$(echo "${{ secrets.DOCKER_USERNAME }}" | tr '[:upper:]' '[:lower:]')
+          docker_registry_image=$(echo "${{ secrets.DOCKER_REGISTRY_IMAGE }}" | tr '[:upper:]' '[:lower:]')
+          docker build -t $docker_username/$docker_registry_image:${{ github.sha }} -t $docker_username/$docker_registry_image:latest .
 
       - name: Publish Docker image versions
         run: |
-          docker push --all-tags  ${{secrets.DOCKER_USERNAME}}/${{secrets.DOCKER_REGISTRY_IMAGE }}
+          docker_username=$(echo "${{ secrets.DOCKER_USERNAME }}" | tr '[:upper:]' '[:lower:]')
+          docker_registry_image=$(echo "${{ secrets.DOCKER_REGISTRY_IMAGE }}" | tr '[:upper:]' '[:lower:]')
+          docker push --all-tags $docker_username/$docker_registry_image
 
       - name: Deploy to Dev
-        #votre travail
-        #se connecter a un serveur distant et deployer l'image docker que vous venez de builder
         run: |
           ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             echo "1) Logging in to my remote server ..."
 
-            # Commandes pour vous connecter à votre serveur distant et déployer Docker
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
             docker stop todo-app || true
             docker rm todo-app || true
@@ -97,14 +91,11 @@ jobs:
           EOF
 
       - name: Wait for deploy to finish
-        #votre travail
         run: |
           echo "Waiting for 30 seconds ..."
           sleep 30
 
       - name: Check deploy
-        #verifier si le deploiement s'est bien passe
-        #votre travail
         run: |
           status=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:80/cicd/_health)
           if [ "$status" != "200" ]; then
@@ -113,6 +104,3 @@ jobs:
           else
             echo "Deployment succeeded: $status"
           fi
-
-
-
