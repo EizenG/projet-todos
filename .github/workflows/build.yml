@@ -80,8 +80,12 @@ jobs:
           docker push --all-tags $docker_username/$docker_registry_image
 
       - name: Deploy to Dev
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
         run: |
-          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+          mkdir -p ~/.ssh
+          chmod 600 ~/.ssh/id_rsa
+          ssh -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             echo "1) Logging in to my remote server ..."
 
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
