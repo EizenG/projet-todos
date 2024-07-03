@@ -44,7 +44,15 @@ jobs:
         run: mvn test -Pit
 
       - name: Quality Gate
-        run:  mvn clean verify sonar:sonar -Dsonar.organization=ept-git -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=seenibu_poc-todos
+        run:  mvn clean verify sonar:sonar -Dsonar.organization=eizeng -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=EizenG_projet-todos
 
       - name: Check Quality Gate
-        run: echo "Checking if quality gate is met ... "
+        run: |
+          status=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=EizenG_projet-todos" | jq -r '.projectStatus.status')
+          if [ "$status" != "OK" ]; then
+            echo "Quality Gate failed: $status"
+            exit 1
+          else
+            echo "Quality Gate passed: $status"
+          fi
