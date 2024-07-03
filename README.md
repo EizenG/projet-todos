@@ -35,3 +35,4 @@ http://localhost:8080/cicd/api/todos
 ## Contact
 
 Dr. SENE - <a href="mailto:senei@ept.sn">senei@ept.sn</a>
+Test de pipeline GitHub Actions
