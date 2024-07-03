@@ -35,7 +35,7 @@ jobs:
           restore-keys: ${{ runner.os }}-m2
 
       - name: Dependencies Scan
-        #if: 1>2
+        if: 1>2
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: mvn clean verify -DskipTests -Pcve 
