@@ -47,12 +47,21 @@ jobs:
       - name: Quality Gate
         #votre travail
         #adapter : peut utiliser sonarcloud ou une instance distante
-        run: mvn clean verify sonar:sonar -Dsonar.organization=ept-git -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=seenibu_poc-todos
+        run: mvn clean verify sonar:sonar -Dsonar.organization=eizeng -Dsonar.host.url=https://sonarcloud.io -Dsonar.token=${{ secrets.SONAR_TOKEN }} -Dsonar.projectKey=EizenG_projet-todos
 
       - name: Check Quality Gate
         #votre travail
         #verifier si la Quality Gate is ok
-        run: echo "Checking quality gate ... "
+        # Tester pour voir si jq est installe sur mon environement Github action ou non
+        run: |
+          status=$(curl -s -u ${{ secrets.SONAR_TOKEN }}: \
+            "https://sonarcloud.io/api/qualitygates/project_status?projectKey=EizenG_projet-todos" | jq -r '.projectStatus.status')
+          if [ "$status" != "OK" ]; then
+            echo "Quality Gate failed: $status"
+            exit 1
+          else
+            echo "Quality Gate passed: $status"
+          fi
 
       - name: Package
         run: mvn -B package  -DskipTests=true
@@ -74,16 +83,34 @@ jobs:
       - name: Deploy to Dev
         #votre travail
         #se connecter a un serveur distant et deployer l'image docker que vous venez de builder
-        run: echo " 1) Login to my remote server ...\n 2) Stop docker container if running ... \n 3) Pull latest version and run it ... "
+        run: |
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
+            echo "1) Logging in to my remote server ..."
+
+            # Commandes pour vous connecter à votre serveur distant et déployer Docker
+            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
+            docker stop todo-app || true
+            docker rm todo-app || true
+            docker run -d --name todo-app -p 80:80 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
+          EOF
 
       - name: Wait for deploy to finish
         #votre travail
-        run: echo "Wait 30s ... "
+        run: |
+          echo "Waiting for 30 seconds ..."
+          sleep 30
 
       - name: Check deploy
         #verifier si le deploiement s'est bien passe
         #votre travail
-        run: echo " 1) Run Get request <my_server_ip:my_port/cicd/_health> to check if service is running ...\n 2) Get request should return 200 with content <Welcome to my Todo app> ..."
+        run: |
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:80/cicd/_health)
+          if [ "$status" != "200" ]; then
+            echo "Deployment failed: $status"
+            exit 1
+          else
+            echo "Deployment succeeded: $status"
+          fi
 
 
 
