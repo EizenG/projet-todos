@@ -93,7 +93,7 @@ jobs:
             docker pull eizeng/todo-app:latest
             docker stop todo-app || true
             docker rm todo-app || true
-            docker run -d --name todo-app -p 80:80 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
+            docker run -d --name todo-app -p 80:80 eizeng/todo-app:latest
           EOF
 
       - name: Wait for deploy to finish
