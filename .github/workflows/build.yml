@@ -102,8 +102,10 @@ jobs:
           sleep 30
 
       - name: Check deploy
+        env:
+          SSH_HOST1: ${{ secrets.SSH_HOST }}
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" http://${{ secrets.SSH_HOST }}:80/cicd/_health)
+          status=$(curl -s -o /dev/null -w "%{http_code}" http://$SSH_HOST1:80/cicd/_health)
           if [ "$status" != "200" ]; then
             echo "Deployment failed: $status"
             exit 1
