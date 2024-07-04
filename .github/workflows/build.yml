@@ -89,8 +89,8 @@ jobs:
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
             echo "1) Logging in to my remote server ..."
-            echo "$secrets.DOCKER_USERNAME / $secrets.DOCKER_REGISTRY_IMAGE"
-            docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
+           
+            docker pull eizeng/todo-app:latest
             docker stop todo-app || true
             docker rm todo-app || true
             docker run -d --name todo-app -p 80:80 ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REGISTRY_IMAGE }}:latest
