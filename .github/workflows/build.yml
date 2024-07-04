@@ -105,7 +105,7 @@ jobs:
         env:
           SSH_HOSTT: ${{ secrets.SSH_HOST }}
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" http://$SSH_HOSTT:80/cicd/_health)
+          status=$(curl -s -o /dev/null -w "%{http_code}" -m 20 http://$SSH_HOSTT:80/cicd/_health)
           if [ "$status" != "200" ]; then
             echo "Deployment failed: $status"
             exit 1
