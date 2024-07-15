@@ -48,7 +48,7 @@ public class CucumberStepIT {
     private String title;
     private String description;
     private Response response;
-    private static final ObjectMapper objectMapper = new ObjectMapper();;
+    private static final ObjectMapper objectMapper = new ObjectMapper();
     @Autowired
     private TodoRepository todoRepository;
 

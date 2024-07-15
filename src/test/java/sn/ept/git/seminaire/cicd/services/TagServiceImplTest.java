@@ -124,7 +124,7 @@ public class TagServiceImplTest {
   }
 
   @Test
-  public void save_WhenTagDoesNotExist_ShouldSaveTagSuccessfully() {
+  void save_WhenTagDoesNotExist_ShouldSaveTagSuccessfully() {
         mockFindByNameNotFound();
         mockSaveAndFlush();
 
@@ -137,14 +137,14 @@ public class TagServiceImplTest {
     }
 
   @Test
-  public void save_WhenTagExists_ShouldThrowItemExistsException(){
+  void save_WhenTagExists_ShouldThrowItemExistsException(){
     mockFindByNameFound();
 
     assertThrows(ItemExistsException.class, () -> service.save(tagDTO));
   }
 
   @Test
-  public void delete_WhenTagExists_ShouldDeleteTagSuccessfully() {
+  void delete_WhenTagExists_ShouldDeleteTagSuccessfully() {
     mockFindByIdFound();
     mockDeleteById();
 
@@ -152,17 +152,17 @@ public class TagServiceImplTest {
   }
 
   @Test
-  public void delete_WhenTagDoesNotExist_ShouldThrowItemNotFoundException() {
+  void delete_WhenTagDoesNotExist_ShouldThrowItemNotFoundException() {
     mockFindByIdNotFound();
+    String tagId = tagDTO.getId();
 
-    assertThatThrownBy(() -> service.delete(tagDTO
-        .getId()))
+    assertThatThrownBy(() -> service.delete(tagId))
                 .isInstanceOf(ItemNotFoundException.class)
-                .hasMessageContaining(ItemNotFoundException.format(ItemNotFoundException.TAG_BY_ID, tagDTO.getId()));
+                .hasMessageContaining(ItemNotFoundException.format(ItemNotFoundException.TAG_BY_ID, tagId));
   }
 
   @Test
-  public void findById_WhenTagExists_ShouldReturnTagDTO() {
+  void findById_WhenTagExists_ShouldReturnTagDTO() {
     mockFindByIdFound();
 
     final Optional<TagDTO> optional = service.findById(tagDTO.getId());
@@ -176,7 +176,7 @@ public class TagServiceImplTest {
   }
 
    @Test
-    public void findById_WhenTagDoesNotExist_ShouldReturnEmptyOptional() {
+   void findById_WhenTagDoesNotExist_ShouldReturnEmptyOptional() {
         mockFindByIdNotFound();
 
         final Optional<TagDTO> optional = service.findById("a bad id");
@@ -187,7 +187,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findAll_WhenAtLeastOneTagExist_ShouldReturnListOfTag() {
+    void findAll_WhenAtLeastOneTagExist_ShouldReturnListOfTag() {
       mockFindAll();
 
       final List<TagDTO> allTagDTO = service.findAll();
@@ -200,7 +200,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findAll_WhenNoTagExist_ShouldReturnEmptyList() {
+    void findAll_WhenNoTagExist_ShouldReturnEmptyList() {
       mockFindAllNoTagExist();
 
       final List<TagDTO> allTagDTO = service.findAll();
@@ -210,7 +210,7 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findAllPageable_WhenAtLeastOneTagExist_ShouldReturnPageOfTags() {
+    void findAllPageable_WhenAtLeastOneTagExist_ShouldReturnPageOfTags() {
       mockFindAllPageable();
 
       final Page<TagDTO> pageTags = service.findAll(PageRequest.of(0, 5));
@@ -223,18 +223,18 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void findAllPageable_WhenNoTagExist_ShouldReturnEmptyPage() {
+    void findAllPageable_WhenNoTagExist_ShouldReturnEmptyPage() {
       mockFindAllPageableNoTagExist();
 
       final Page<TagDTO> pageTags = service.findAll(PageRequest.of(3, 5));
 
       assertNotNull(pageTags);
       assertThat(pageTags.getContent()).isEmpty();
-      assertThat(pageTags.getTotalElements()).isEqualTo(0);
+      assertThat(pageTags.getTotalElements()).isZero();
     }
 
     @Test
-    public void update_WhenTagExistsAndNoDuplicateName_ShouldUpdateAndReturnTagDTO() {
+    void update_WhenTagExistsAndNoDuplicateName_ShouldUpdateAndReturnTagDTO() {
       mockFindByIdFound();
       mockFindByNameWithIdNotEqualsNotFound();
       mockSaveAndFlush();
@@ -249,22 +249,24 @@ public class TagServiceImplTest {
     }
 
     @Test
-    public void update_WhenTagDoesNotExist_ShouldThrowItemNotFoundException() {
+    void update_WhenTagDoesNotExist_ShouldThrowItemNotFoundException() {
       mockFindByIdNotFound();
+      String tagId = tagDTO.getId();
 
       assertThrows(
           ItemNotFoundException.class,
-          () -> service.update(tagDTO.getId(), tagDTO));
+          () -> service.update(tagId, tagDTO));
     }
 
     @Test
-    public void update_WhenDuplicateTagNameExists_ShouldThrowItemExistsException() {
+    void update_WhenDuplicateTagNameExists_ShouldThrowItemExistsException() {
       mockFindByIdFound();
       mockFindByNameWithIdNotEqualsFound();
+      String tagId = tagDTO.getId();
 
       assertThrows(
           ItemExistsException.class,
-          () -> service.update(tagDTO.getId(), tagDTO));
+          () -> service.update(tagId, tagDTO));
     }
 
     @Test
