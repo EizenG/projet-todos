@@ -1,7 +1,6 @@
 package sn.ept.git.seminaire.cicd.resources;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayNameGeneration;
 import org.junit.jupiter.api.Test;
@@ -10,11 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import sn.ept.git.seminaire.cicd.ReplaceCamelCase;
-import sn.ept.git.seminaire.cicd.data.TestData;
 import sn.ept.git.seminaire.cicd.data.TodoDTOTestData;
 import sn.ept.git.seminaire.cicd.models.TodoDTO;
 import sn.ept.git.seminaire.cicd.exceptions.ItemNotFoundException;

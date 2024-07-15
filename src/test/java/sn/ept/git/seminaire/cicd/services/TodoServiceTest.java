@@ -1,6 +1,5 @@
 package sn.ept.git.seminaire.cicd.services;
 
-import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;

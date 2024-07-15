@@ -8,7 +8,9 @@ import java.util.UUID;
 
 public class TestData {
 
-    public TestData(){}
+    public TestData(){
+        // Cette méthode est vide intentionnellement.
+    }
 
     public static final class Default {
         private Default() {
