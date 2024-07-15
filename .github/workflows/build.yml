@@ -88,7 +88,7 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan -H ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} << 'EOF'
-            echo "1) Logging in to my remote server ..."
+            echo "Connecter a la machine virtuelle azure ..."
            
             docker pull eizeng/todo-app:latest
             docker stop todo-app || true
@@ -98,17 +98,22 @@ jobs:
 
       - name: Wait for deploy to finish
         run: |
-          echo "Waiting for 30 seconds ..."
+          echo "Attendre 30 sec pour le deploiement puisse finir ..."
           sleep 30
 
       - name: Check deploy
         env:
           SSH_HOSTT: ${{ secrets.SSH_HOST }}
         run: |
-          status=$(curl -s -o /dev/null -w "%{http_code}" -m 20 http://$SSH_HOSTT:80/cicd/_health)
-          if [ "$status" != "200" ]; then
-            echo "Deployment failed: $status"
+          codeStatus=$(curl -s -o /dev/null -w "%{http_code}" http://$SSH_HOSTT:80/cicd/_health)
+          if [ "$codeStatus" -ne 200 ]; then
+            echo "Health check echoue avec le status code $codeStatus"
             exit 1
-          else
-            echo "Deployment succeeded: $status"
           fi
+          CONTENT=$(curl -s http://$SSH_HOSTT:80/cicd)
+          if [ "$CONTENT" != "Welcome to my Todo app" ]; then
+            echo "Health check failed. le content 'Welcome to my Todo app' n'est pas trouve."
+            exit 1
+          fi
+          echo "Le deploiement est un success"
+          

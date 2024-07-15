@@ -179,7 +179,7 @@ public class TagServiceImplTest {
     public void findById_WhenTagDoesNotExist_ShouldReturnEmptyOptional() {
         mockFindByIdNotFound();
 
-        final Optional<TagDTO> optional = service.findById(tagDTO.getId());
+        final Optional<TagDTO> optional = service.findById("a bad id");
 
         assertThat(optional)
             .isNotNull()
