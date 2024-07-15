@@ -111,6 +111,7 @@ jobs:
             exit 1
           fi
           CONTENT=$(curl -s http://$SSH_HOSTT:80/cicd)
+          echo "le contenu est : $CONTENT"
           if [ "$CONTENT" != "Welcome to my Todo app" ]; then
             echo "Health check failed. le content 'Welcome to my Todo app' n'est pas trouve."
             exit 1
