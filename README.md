@@ -1,6 +1,6 @@
 
 # Todo
-basic todo project for teaching purpose only 
+Basic todo project for teaching purpose only 
 
 # Requirements
 <ul>
